@@ -1,7 +1,10 @@
 #include <iostream>
-//#include <async_simple/coro/Lazy.h>
+
+#include "tcpServer.h"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+    tcpServer server(8888, "0.0.0.0");
+    server.start(4);
+
+    while (1);
 }

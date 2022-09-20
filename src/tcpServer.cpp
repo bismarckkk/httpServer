@@ -9,11 +9,11 @@
 #include "../include/utils/exception.h"
 #include "../include/tcpServer.h"
 
-[[maybe_unused]] tcpServer::tcpServer(uint16_t port, in_addr_t addr) {
+tcpServer::tcpServer(uint16_t port, in_addr_t addr) {
     tcpServer::init(htons(port), htons(addr));
 }
 
-[[maybe_unused]] tcpServer::tcpServer(uint16_t port, const std::string& addr) {
+tcpServer::tcpServer(uint16_t port, const std::string& addr) {
     tcpServer::init(htons(port), inet_addr(addr.c_str()));
 }
 

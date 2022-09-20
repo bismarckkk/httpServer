@@ -66,7 +66,7 @@ tcpServerThread::~tcpServerThread() {
 void tcpServerThread::start() {
     running = true;
     addFdToEpoll(epollFd, socketFd, true);
-    thread(&tcpServerThread::run, this);
+    workThread = thread(&tcpServerThread::run, this);
 }
 
 void tcpServerThread::run() {

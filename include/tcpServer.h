@@ -26,9 +26,8 @@ private:
 
     void init(uint16_t port, in_addr_t addr);
 public:
-    [[maybe_unused]] explicit tcpServer(uint16_t port=8888, in_addr_t addr=INADDR_ANY);
-
-    [[maybe_unused]] explicit tcpServer(uint16_t port=8888, const std::string& addr="0.0.0.0");
+    explicit tcpServer(uint16_t port=8888, in_addr_t addr=INADDR_ANY);
+    explicit tcpServer(uint16_t port=8888, const std::string& addr="0.0.0.0");
     void start(int threadNum=1);
 };
 
