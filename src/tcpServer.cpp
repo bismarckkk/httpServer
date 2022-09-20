@@ -32,6 +32,10 @@ void tcpServer::init(uint16_t port, in_addr_t addr) {
     if (result == -1) {
         throw socketBindError();
     }
+
+    if (listen(socketFd, 10) == -1) {
+        throw socketListenError();
+    }
 }
 
 void tcpServer::start(const int threadNum) {

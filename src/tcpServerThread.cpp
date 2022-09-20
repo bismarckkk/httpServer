@@ -4,6 +4,8 @@
 // https://github.com/bismarckkk
 //
 
+#include <iostream>
+
 #include <netinet/in.h>
 #include <sys/socket.h>
 
@@ -65,7 +67,7 @@ tcpServerThread::~tcpServerThread() {
 
 void tcpServerThread::start() {
     running = true;
-    addFdToEpoll(epollFd, socketFd, true);
+    addFdToEpoll(epollFd, socketFd, false);
     workThread = thread(&tcpServerThread::run, this);
 }
 
@@ -77,6 +79,7 @@ void tcpServerThread::run() {
         }
 
         for (int i = 0; i < eventNum; i++) {
+            std::cout << "get event\r\n";
             int listenFd = epollEvents[i].data.fd;
 
             if (socketFd == listenFd) {
@@ -86,11 +89,22 @@ void tcpServerThread::run() {
                 if (connFd < 0) {
                     continue;
                 }
-                workers.insert_or_assign(connFd, worker(epollFd, connFd));
+                workers.erase(connFd);
+                workers.emplace(connFd, std::move(worker(epollFd, connFd)));
+                std::cout << "someone connect\r\n";
             } else if (epollEvents[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR)) {
-                removeFdFromEpoll(epollFd, listenFd);
-            } else {
-                workers[listenFd].process();
+                if (workers.erase(listenFd) == 0) {
+                    removeFdFromEpoll(epollFd, listenFd);
+                }
+                std::cout << "someone disconnect\r\n";
+            } else if (epollEvents[i].events & EPOLLOUT) {
+                auto it = workers.find(listenFd);
+                if (it != workers.end()) {
+                    it->second.workerWrite();
+                }
+            } else if (epollEvents[i].events & EPOLLIN) {
+                std::cout << "someone send message\r\n";
+                workers[listenFd].workerRead();
             }
         }
     }

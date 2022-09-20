@@ -11,6 +11,7 @@
 
 void addFdToEpoll(int epollFd, int socketFd, bool oneShot);
 void removeFdFromEpoll(int epollFd, int connFd);
-void resetEpollOneShot(int epollFd, int connFd, int event);
+void resetEpollOneShot(int epollFd, int connFd);
+void resetEpollWrite(int epollFd, int connFd);
 
 #endif //HTTPSERVER_EPOLL_H

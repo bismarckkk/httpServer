@@ -40,10 +40,20 @@ void removeFdFromEpoll(int epollFd, int connFd) {
     close(connFd);
 }
 
-void resetEpollOneShot(int epollFd, int connFd, int event) {
+void resetEpollOneShot(int epollFd, int connFd) {
     epoll_event newEvent{};
     newEvent.data.fd = connFd;
-    newEvent.events = event | EPOLLONESHOT | EPOLLRDHUP | EPOLLET;
+    newEvent.events = EPOLLIN | EPOLLET | EPOLLRDHUP;
+    int result = epoll_ctl(epollFd, EPOLL_CTL_MOD, connFd, &newEvent);
+    if (result == -1) {
+        throw epollCtlError();
+    }
+}
+
+void resetEpollWrite(int epollFd, int connFd) {
+    epoll_event newEvent{};
+    newEvent.data.fd = connFd;
+    newEvent.events = EPOLLIN | EPOLLET | EPOLLRDHUP | EPOLLOUT;
     int result = epoll_ctl(epollFd, EPOLL_CTL_MOD, connFd, &newEvent);
     if (result == -1) {
         throw epollCtlError();

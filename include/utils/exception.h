@@ -25,6 +25,14 @@ struct socketBindError : public std::exception
     }
 };
 
+struct socketListenError : public std::exception
+{
+    [[nodiscard]] const char * what () const noexcept override
+    {
+        return "Cannot listen this socket";
+    }
+};
+
 struct epollCtlError : public std::exception
 {
     [[nodiscard]] const char * what () const noexcept override
