@@ -9,11 +9,11 @@
 #include "../include/utils/exception.h"
 #include "../include/tcpServer.h"
 
-tcpServer::tcpServer(uint16_t port, in_addr_t addr) {
+[[maybe_unused]] tcpServer::tcpServer(uint16_t port, in_addr_t addr) {
     tcpServer::init(htons(port), htons(addr));
 }
 
-tcpServer::tcpServer(uint16_t port, const std::string& addr) {
+[[maybe_unused]] tcpServer::tcpServer(uint16_t port, const std::string& addr) {
     tcpServer::init(htons(port), inet_addr(addr.c_str()));
 }
 
@@ -31,6 +31,13 @@ void tcpServer::init(uint16_t port, in_addr_t addr) {
     int result = bind(socketFd, (sockaddr *)&socketAddr, sizeof socketAddr);
     if (result == -1) {
         throw socketBindError();
+    }
+}
+
+void tcpServer::start(const int threadNum) {
+    threadsPoll.resize(threadNum, tcpServerThread(socketFd));
+    for (auto& workThread :threadsPoll) {
+        workThread.start();
     }
 }
 

@@ -19,6 +19,43 @@ tcpServerThread::tcpServerThread(int _socketFd) {
     socketFd = _socketFd;
 }
 
+tcpServerThread::tcpServerThread(tcpServerThread &&other) noexcept {
+    if (this != &other) {
+        running = false;
+        if (other.running) {
+            running = true;
+        }
+        epollFd = other.epollFd;
+        socketFd = other.socketFd;
+        workers = std::move(other.workers);
+        workThread = std::move(other.workThread);
+
+        other.epollFd = -1;
+        other.socketFd = -1;
+    }
+}
+
+tcpServerThread::tcpServerThread(const tcpServerThread & other) {
+    if (this != &other) {
+        epollFd = epoll_create(EVENTS_SIZE);
+        if (epollFd == -1) {
+            throw epollCtlError();
+        }
+        socketFd = other.socketFd;
+    }
+}
+
+tcpServerThread &tcpServerThread::operator=(const tcpServerThread& other) {
+    if (this != &other) {
+        epollFd = epoll_create(EVENTS_SIZE);
+        if (epollFd == -1) {
+            throw epollCtlError();
+        }
+        socketFd = other.socketFd;
+    }
+    return *this;
+}
+
 tcpServerThread::~tcpServerThread() {
     running = false;
     if (workThread.joinable()) {

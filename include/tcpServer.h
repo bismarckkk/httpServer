@@ -9,6 +9,7 @@
 
 
 #include <string>
+#include <vector>
 
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -16,16 +17,19 @@
 
 #include "tcpServerThread.h"
 
+using std::vector;
+
 class tcpServer {
 private:
-    int socketFd;
+    int socketFd{};
+    vector<tcpServerThread> threadsPoll;
 
     void init(uint16_t port, in_addr_t addr);
 public:
-    explicit tcpServer(uint16_t port=8888, in_addr_t addr=INADDR_ANY);
-    explicit tcpServer(uint16_t port=8888, const std::string& addr="0.0.0.0");
+    [[maybe_unused]] explicit tcpServer(uint16_t port=8888, in_addr_t addr=INADDR_ANY);
 
-
+    [[maybe_unused]] explicit tcpServer(uint16_t port=8888, const std::string& addr="0.0.0.0");
+    void start(int threadNum=1);
 };
 
 
